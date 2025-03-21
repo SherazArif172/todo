@@ -35,6 +35,7 @@ const AddTodo = () => {
   });
 
   const onSubmit = (data) => {
+    console.log("Submitting TODO:", data.todoText);
     dispatch(addTodo(data.todoText));
     reset();
   };

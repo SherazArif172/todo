@@ -39,7 +39,7 @@ export const addTodo = createAsyncThunk("addTodo", async (todoText) => {
     userId: 1,
   };
 
-  const localTodos = JSON.parse(localStorage.getItem("localTodos"));
+  const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
   localTodos.unshift(newTodo);
   localStorage.setItem("localTodos", JSON.stringify(localTodos));
   localStorage.setItem("localTodosTimestamp", new Date().getTime().toString());
@@ -50,7 +50,7 @@ export const addTodo = createAsyncThunk("addTodo", async (todoText) => {
 export const deleteTodo = createAsyncThunk("deleteTodo", async (todoId) => {
   await axios.delete(`https://jsonplaceholder.typicode.com/todos/${todoId}`);
 
-  const localTodos = JSON.parse(localStorage.getItem("localTodos"));
+  const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
   const updatedTodos = localTodos.filter((todo) => todo.id !== todoId);
   localStorage.setItem("localTodos", JSON.stringify(updatedTodos));
   localStorage.setItem("localTodosTimestamp", new Date().getTime().toString());
@@ -61,7 +61,7 @@ export const deleteTodo = createAsyncThunk("deleteTodo", async (todoId) => {
 export const editTodo = createAsyncThunk(
   "editTodo",
   async ({ todoId, todoText }) => {
-    const localTodos = JSON.parse(localStorage.getItem("localTodos"));
+    const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
     const todoToEdit = localTodos.find((todo) => todo.id === todoId);
 
     if (todoToEdit) {
