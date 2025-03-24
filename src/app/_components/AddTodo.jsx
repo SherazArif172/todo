@@ -1,9 +1,7 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addTodo } from "../redux/slices/todoSlice";
+import { useAddTodoMutation } from "../redux/slices/todoSlice";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -11,16 +9,10 @@ import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-
-const todoSchema = z.object({
-  todoText: z
-    .string()
-    .min(3, "Todo must be at least 3 characters long")
-    .max(100, "Todo cannot exceed 20 characters"),
-});
+import todoSchema from "../schema/input.schema";
 
 const AddTodo = () => {
-  const dispatch = useDispatch();
+  const [addTodo] = useAddTodoMutation();
 
   const {
     control,
@@ -34,10 +26,13 @@ const AddTodo = () => {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log("Submitting TODO:", data.todoText);
-    dispatch(addTodo(data.todoText));
-    reset();
+  const onSubmit = async (data) => {
+    try {
+      await addTodo(data.todoText).unwrap();
+      reset();
+    } catch (err) {
+      console.error("Failed to add todo:", err);
+    }
   };
 
   return (

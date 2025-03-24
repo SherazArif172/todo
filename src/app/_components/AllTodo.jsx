@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Button,
   IconButton,
@@ -10,15 +10,18 @@ import {
 } from "@mui/material";
 import { Trash2 } from "lucide-react";
 import { SquarePen } from "lucide-react";
-import { deleteTodo, fetchTodo, editTodo } from "../redux/slices/todoSlice";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  useGetTodosQuery,
+  useDeleteTodoMutation,
+  useEditTodoMutation,
+} from "../redux/slices/todoSlice";
 import Box from "@mui/material/Box";
 
 const TodoItem = React.memo(
   ({ item, onDelete, onEdit, isEditing, handleSaveEdit }) => {
     const [editText, setEditText] = useState(item.title);
 
-    useEffect(() => {
+    React.useEffect(() => {
       if (isEditing) {
         setEditText(item.title);
       }
@@ -78,17 +81,17 @@ const TodoItem = React.memo(
 );
 
 const AllTodo = () => {
-  const dispatch = useDispatch();
-  const { data, isLoading, error } = useSelector((state) => state.todo);
-
+  const { data: todos, isLoading, error } = useGetTodosQuery();
+  const [deleteTodo] = useDeleteTodoMutation();
+  const [editTodo] = useEditTodoMutation();
   const [editingId, setEditingId] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchTodo());
-  }, [dispatch]);
-
-  const handleDelete = (todoId) => {
-    dispatch(deleteTodo(todoId));
+  const handleDelete = async (todoId) => {
+    try {
+      await deleteTodo(todoId).unwrap();
+    } catch (err) {
+      console.error("Failed to delete todo:", err);
+    }
   };
 
   const handleEdit = (todo) => {
@@ -99,10 +102,14 @@ const AllTodo = () => {
     }
   };
 
-  const handleSaveEdit = (updatedText) => {
+  const handleSaveEdit = async (updatedText) => {
     if (editingId && updatedText.trim()) {
-      dispatch(editTodo({ todoId: editingId, todoText: updatedText }));
-      setEditingId(null);
+      try {
+        await editTodo({ todoId: editingId, todoText: updatedText }).unwrap();
+        setEditingId(null);
+      } catch (err) {
+        console.error("Failed to edit todo:", err);
+      }
     }
   };
 
@@ -118,7 +125,7 @@ const AllTodo = () => {
     <Box sx={{ maxWidth: 540, mx: "auto", p: 2 }}>
       <Paper elevation={2}>
         <List>
-          {data?.map((item) => (
+          {todos?.map((item) => (
             <TodoItem
               key={item.id}
               item={item}
