@@ -2,7 +2,6 @@ import React from "react";
 import { useAddTodoMutation } from "../redux/slices/todoSlice";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -10,6 +9,7 @@ import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import todoSchema from "../schema/input.schema";
+import CustomInput from "./ui/CustomInput";
 
 const AddTodo = () => {
   const [addTodo] = useAddTodoMutation();
@@ -55,11 +55,8 @@ const AddTodo = () => {
               name="todoText"
               control={control}
               render={({ field }) => (
-                <TextField
+                <CustomInput
                   {...field}
-                  fullWidth
-                  variant="outlined"
-                  size="small"
                   placeholder="Add a new todo..."
                   error={!!errors.todoText}
                   helperText={errors.todoText?.message}

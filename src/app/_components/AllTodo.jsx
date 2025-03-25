@@ -6,7 +6,6 @@ import {
   ListItem,
   ListItemText,
   Paper,
-  TextField,
 } from "@mui/material";
 import { Trash2 } from "lucide-react";
 import { SquarePen } from "lucide-react";
@@ -16,6 +15,7 @@ import {
   useEditTodoMutation,
 } from "../redux/slices/todoSlice";
 import Box from "@mui/material/Box";
+import CustomInput from "./ui/CustomInput";
 
 const TodoItem = React.memo(
   ({ item, onDelete, onEdit, isEditing, handleSaveEdit }) => {
@@ -52,10 +52,9 @@ const TodoItem = React.memo(
       >
         {isEditing ? (
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            <TextField
+            <CustomInput
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              size="small"
             />
             <Button onClick={() => handleSaveEdit(editText)}>Save</Button>
             <Button onClick={() => onEdit(null)}>Cancel</Button>
