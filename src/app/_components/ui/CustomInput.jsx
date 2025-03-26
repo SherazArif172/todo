@@ -26,6 +26,7 @@ const CustomInput = ({
       onChange={onChange}
       placeholder={placeholder}
       className={className}
+      aria-readonly
       {...props}
     />
   );

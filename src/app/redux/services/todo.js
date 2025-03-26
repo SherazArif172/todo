@@ -1,18 +1,36 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+const EXPIRY_TIME = 60 * 1000; // 60 seconds
+
+const saveLocalTodos = (todos) => {
+  localStorage.setItem("localTodos", JSON.stringify(todos));
+  localStorage.setItem("todosExpiry", Date.now());
+};
+
+const getValidLocalTodos = () => {
+  const expiry = localStorage.getItem("todosExpiry");
+  if (expiry && Date.now() - expiry > EXPIRY_TIME) {
+    localStorage.removeItem("localTodos");
+    localStorage.removeItem("todosExpiry");
+    return [];
+  }
+  return JSON.parse(localStorage.getItem("localTodos")) || [];
+};
+
 export const todoApi = createApi({
   reducerPath: "todoApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://jsonplaceholder.typicode.com",
   }),
   tagTypes: ["Todos"],
+  keepUnusedDataFor: 60,
 
   endpoints: (builder) => ({
     getTodos: builder.query({
       query: () => "todos",
       providesTags: ["Todos"],
       transformResponse: (response) => {
-        const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
+        const localTodos = getValidLocalTodos();
         return [...localTodos, ...response];
       },
     }),
@@ -26,9 +44,9 @@ export const todoApi = createApi({
           userId: 1,
         };
 
-        const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
+        const localTodos = getValidLocalTodos();
         localTodos.unshift(newTodo);
-        localStorage.setItem("localTodos", JSON.stringify(localTodos));
+        saveLocalTodos(localTodos);
 
         return { data: newTodo };
       },
@@ -37,9 +55,9 @@ export const todoApi = createApi({
 
     deleteTodo: builder.mutation({
       queryFn: (todoId) => {
-        const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
+        const localTodos = getValidLocalTodos();
         const updatedTodos = localTodos.filter((todo) => todo.id !== todoId);
-        localStorage.setItem("localTodos", JSON.stringify(updatedTodos));
+        saveLocalTodos(updatedTodos);
         return { data: todoId };
       },
       invalidatesTags: ["Todos"],
@@ -47,12 +65,12 @@ export const todoApi = createApi({
 
     editTodo: builder.mutation({
       queryFn: ({ todoId, todoText }) => {
-        const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
+        const localTodos = getValidLocalTodos();
         const todoToEdit = localTodos.find((todo) => todo.id === todoId);
 
         if (todoToEdit) {
           todoToEdit.title = todoText;
-          localStorage.setItem("localTodos", JSON.stringify(localTodos));
+          saveLocalTodos(localTodos);
           return { data: todoToEdit };
         }
 
