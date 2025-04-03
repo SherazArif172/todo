@@ -13,7 +13,7 @@ import {
   useGetTodosQuery,
   useDeleteTodoMutation,
   useEditTodoMutation,
-} from "../redux/slices/todoSlice";
+} from "../redux/services/todo";
 import Box from "@mui/material/Box";
 import CustomInput from "./ui/CustomInput";
 

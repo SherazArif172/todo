@@ -11,6 +11,7 @@ export const todoApi = createApi({
     getTodos: builder.query({
       query: () => "todos",
       providesTags: ["Todos"],
+      keepUnusedDataFor: 5,
       transformResponse: (response) => {
         const localTodos = JSON.parse(localStorage.getItem("localTodos")) || [];
         return [...localTodos, ...response];

@@ -1,5 +1,5 @@
 import React from "react";
-import { useAddTodoMutation } from "../redux/slices/todoSlice";
+import { useAddTodoMutation } from "../redux/services/todo";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@mui/material/Button";
